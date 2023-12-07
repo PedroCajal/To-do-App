@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Switch } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from 'react-native-date-picker';
 
 export default function AddToDo() {
     
-    const [shown, setShown] = useState(true);
-
+    const [showText, setShowText] = useState(false)
     const [name, setName] = useState('');
 
     const [date, setDate] = useState(new Date());
@@ -15,7 +14,7 @@ export default function AddToDo() {
     return(
         <View style={styles.container}>
             <Text style={styles.title}>Add Task</Text>
-            <View style={{flexDirection:'row', justifyContent:'space-between', paddingBottom:30}}>
+            <View style={styles.inputContainer}>
                 <Text style={styles.inputTitle}>Name</Text>
                 <TextInput
                     style={styles.textInput}
@@ -24,17 +23,36 @@ export default function AddToDo() {
                     onChangeText={(text) => {setName(text)}}
                 />
             </View>
-            <View style={{flexDirection:'row', justifyContent:'space-between', paddingBottom:30}}>
+            <View style={styles.inputContainer}>
                 <Text style={styles.inputTitle}>Hour</Text>
-                <DateTimePicker
-                value={date}
-                mode={'time'}
-                is24Hour={true}
-                disabled={shown}
-                onChange={(event, selectedDate) => {setDate(selectedDate), setShown(false)}}
-                style={{width:'80%'}}
-                />
+                {showText &&<DatePicker
+                    date={date}
+                    mode='time'
+                    open={showText}
+                    modal
+                    onConfirm={(date) => {
+                        setShowText(false)
+                        setDate(date)
+                    }}
+                    onCancel={() => {
+                        setShowText(false)
+                    }}
+                    />}
+                    <TouchableOpacity onPress={() => setShowText(true)} style={styles.dateInput}>
+                        <Text style={{fontSize:20}}>{date.getHours()}:{date.getMinutes()}</Text>
+                    </TouchableOpacity>
+
             </View>
+            <View style={styles.inputContainer}>
+                <Text style={styles.inputTitle}>Today</Text>
+                <Switch
+                    value={isToday}
+                    onValueChange={(value) => { setIsToday(value)}}/>
+            </View>              
+            <TouchableOpacity style={styles.button}>
+                    <Text style={{color:'white'}}>Done</Text>
+            </TouchableOpacity>
+            <Text style={{marginLeft:15,color:'#00000060'}}>If you disable today, the task will be considered as tomorrow</Text>
         </View>
     )
 }
@@ -56,10 +74,33 @@ const styles = StyleSheet.create({
         fontWeight:'600',
         lineHeight:24
     },
+    dateInput:{
+        borderBottomColor:'#00000030',
+        borderBottomWidth:1,
+        paddingLeft:6,
+        width:50,
+        backgroundColor:'#D9D9D9',
+        borderRadius:10
+    },
     textInput:{
+        fontSize:14,
         borderBottomColor:'#00000030',
         borderBottomWidth:1,
         width:'80%',
-        marginTop:-10
+        marginTop:-12
+    },
+    inputContainer:{
+        flexDirection:'row',
+        justifyContent:'space-between',
+        paddingBottom:30
+    },
+    button:{
+        marginTop:50,
+        marginBottom:15,
+        alignItems:'center',
+        justifyContent:'center',
+        backgroundColor:'#000000',
+        height:46,
+        borderRadius:11
     }
 })
